@@ -1,7 +1,7 @@
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from paypalpayoutssdk.core import PayPalHttpClient, SandboxEnvironment
+from paypalpayoutssdk.core import PayPalHttpClient, SandboxEnvironment, LiveEnvironment
 from paypalpayoutssdk.payouts import PayoutsPostRequest
 from paypalhttp import HttpError
 from paypalhttp.encoder import Encoder
@@ -51,7 +51,7 @@ class CreatePayouts(PayPalClient):
                         "currency": "USD",
                         "value": amount
                     },
-                    "receiver": "boyuanliu6@yahoo.com",
+                    "receiver": "",
                     "sender_item_id": "Test_txn_1"
                 }]
             }

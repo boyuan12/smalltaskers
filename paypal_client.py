@@ -1,4 +1,3 @@
-
 import os
 import sys
 from paypalpayoutssdk.core import PayPalHttpClient, SandboxEnvironment
@@ -42,6 +41,6 @@ class PayPalClient:
                 result.append(self.object_to_json(item) if  not self.is_primittive(item) \
                               else self.array_to_json_array(item) if isinstance(item, list) else item)
         return result
-    
+
     def is_primittive(self, data):
         return isinstance(data, str) or isinstance(data, bytes) or isinstance(data, int)

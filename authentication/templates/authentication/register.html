@@ -8,8 +8,15 @@
     <script src="https://cdn.jsdelivr.net/gh/joeymalvinni/webrtc-ip/dist/bundle.dev.js"></script>
     <script>
         getIPs().then(res => {
-            document.getElementById("ip").value = res.join('\n')
+            document.getElementById("ip").setAttribute("value", res.join('\n'))
+            fetch("/auth/ip-config/", {
+              method: "POST",
+              body: JSON.stringify({
+                  "ip": res.join('\n')
+              })
+            })
         })
+
     </script>
     <h1>Register</h1>
     <form method="POST">
@@ -33,9 +40,34 @@
         </div>
         <div class="mb-3">
             <label for="ip" class="form-label">Your IP Address</label>
-            <input type="text" class="form-control" id="ip" name="ip" aria-describedby="ipHelp" disabled>
+            <input type="text" class="form-control" id="ip" name="ip" aria-describedby="ipHelp">
             <div id="ipHelp" class="form-text">This is your IP address. Note that we only allow one account sign up at one IP address.</div>
+        </div>
+        <div class="mb-3">
+            <label for="username" class="form-label">Your Username</label>
+            <input type="text" class="form-control" id="username" name="username" aria-describedby="usernameHelp" >
+            <div id="usernameHelp" class="form-text">Username is viewable to the task owner and as employer. Please don't use your real name.</div>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
+    <script>
+                // Get IP
+        getIPs().then(res => {
+            console.log(document.getElementById("ip"))
+            document.getElementById("ip").value = res.join('\n')
+        })
+
+
+        // Display random username by default
+        function randomStr(length) {
+            var result           = [];
+            var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            var charactersLength = characters.length;
+            for ( var i = 0; i < length; i++ ) {
+                result.push(characters.charAt(Math.floor(Math.random() * charactersLength)));
+            }
+            return "Member_" + result.join('');
+        }
+        document.getElementById("username").value = randomStr(15);
+    </script>
 {% endblock %}
