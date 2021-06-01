@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
@@ -40,3 +40,22 @@ def register(request):
         return HttpResponse("Welcome!")
     else:
         return render(request, "authentication/register.html")
+
+def login_view(request):
+    if request.method == "POST":
+        email = request.POST["email"]
+        password = request.POST["password"]
+
+        user = authenticate(username=email, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect("/")
+        return HttpResponse("Invalid credentials")
+
+    else:
+        return render(request, "authentication/login.html")
+
+def logout_view(request):
+    logout(request)
+    return redirect("/auth/login")
