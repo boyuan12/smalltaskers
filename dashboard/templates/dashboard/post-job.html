@@ -5,7 +5,6 @@
 {% endblock %}
 
 {% block main %}
-    <script src="https://cdn.ckeditor.com/ckeditor5/27.1.0/classic/ckeditor.js"></script>   
     <h1>Post a Job!</h1>
     <form method="POST">
         {% csrf_token %}
@@ -13,15 +12,20 @@
           <label for="title" class="form-label">Title</label>
           <input type="text" class="form-control" id="title" name="title">
         </div>
-        <div id="editor"></div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
+
+    <!--Include the JS & CSS-->
+    <link rel="stylesheet" href="https://richtexteditor.com/richtexteditor/rte_theme_default.css" />
+    <script type="text/javascript" src="https://richtexteditor.com/richtexteditor/rte.js"></script>
+    <script type="text/javascript" src='https://richtexteditor.com/richtexteditor/plugins/all_plugins.js'></script>
+    <div id="div_editor1">
+        <p>Hello world!</p>
+    </div>
     <script>
-        ClassicEditor
-            .create( document.querySelector( '#editor' ) )
-            .catch( error => {
-                console.error( error );
-            } );
+        var editor1cfg = {}
+        editor1cfg.toolbar = "basic";
+        var editor1 = new RichTextEditor("#div_editor1", editor1cfg);
     </script>
 {% endblock %}
