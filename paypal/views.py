@@ -7,6 +7,7 @@ from paypalhttp import HttpError
 from paypalhttp.encoder import Encoder
 from paypalhttp.serializers.json_serializer import Json
 import os
+from .models import Transaction, UserFund
 
 
 # Creating Access Token for Sandbox
@@ -87,6 +88,15 @@ def payment_success(request):
     if request.method == "POST":
         import json
         post_data = json.loads(request.body.decode("utf-8"))
+
+        try:
+            uf = UserFund.object.get(user=request.user)
+        except UserFund.DoesNotExist:
+            UserFund(user=request.user, fund=0).save()
+            uf = UserFund.object.get(user=request.user)
+
+        uf.fund += post_data["amount"]
+        uf.save()
 
         print(post_data)
 

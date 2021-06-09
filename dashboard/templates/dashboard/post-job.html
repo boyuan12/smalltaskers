@@ -12,6 +12,20 @@
           <label for="title" class="form-label">Title</label>
           <input type="text" class="form-control" id="title" name="title">
         </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="div_editor1" name="description" id="description">
+                <p>Make sure to type detail job description, include how to complete a job and how to submit proof</p>
+            </textarea>
+        </div>
+        <div class="mb-3">
+            <label for="price" class="form-label">Price Per Each Valid Completion</label>
+            <input type="number" class="form-control" id="price" name="price">
+        </div>
+        <div class="mb-3">
+            <label for="quantity" class="form-label">Quantity (How many people do you want to reach?) </label>
+            <input type="number" class="form-control" id="quantity" name="quantity">
+        </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
@@ -20,9 +34,7 @@
     <link rel="stylesheet" href="https://richtexteditor.com/richtexteditor/rte_theme_default.css" />
     <script type="text/javascript" src="https://richtexteditor.com/richtexteditor/rte.js"></script>
     <script type="text/javascript" src='https://richtexteditor.com/richtexteditor/plugins/all_plugins.js'></script>
-    <div id="div_editor1">
-        <p>Hello world!</p>
-    </div>
+
     <script>
         var editor1cfg = {}
         editor1cfg.toolbar = "basic";
