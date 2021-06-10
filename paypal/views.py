@@ -2,22 +2,8 @@ from django.http.response import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from paypalpayoutssdk.core import PayPalHttpClient, SandboxEnvironment, LiveEnvironment
-from paypalpayoutssdk.payouts import PayoutsPostRequest
-from paypalhttp import HttpError
-from paypalhttp.encoder import Encoder
-from paypalhttp.serializers.json_serializer import Json
 import os
 from .models import Transaction, UserFund
-
-
-# Creating Access Token for Sandbox
-client_id = os.getenv("PAYPAL_CLIENT_ID")
-client_secret = os.getenv("PAYPAL_CLIENT_SECRET")
-# Creating an environment
-environment = SandboxEnvironment(client_id=client_id, client_secret=client_secret)
-client = PayPalHttpClient(environment)
-
-
 import json
 import random
 import string
@@ -27,16 +13,32 @@ from paypalhttp.serializers.json_serializer import Json
 from paypalhttp.http_error import HttpError
 from paypalhttp.encoder import Encoder
 
+# Creating Access Token for Sandbox
+client_id = os.getenv("PAYPAL_CLIENT_ID")
+client_secret = os.getenv("PAYPAL_CLIENT_SECRET")
+# Creating an environment
+environment = SandboxEnvironment(client_id=client_id, client_secret=client_secret)
+client = PayPalHttpClient(environment)
+
+
+
+
 class CreatePayouts(PayPalClient):
 
     """ Creates a payout batch with 5 payout items
     Calls the create batch api (POST - /v1/payments/payouts)
     A maximum of 15000 payout items are supported in a single batch request"""
-    @staticmethod
-    def build_request_body(include_validation_failure = False):
+
+    def __init__(self, amount, receiver):
+        self.amount = amount
+        self.receiver = receiver
+        PayPalClient.__init__(self)
+
+    # @staticmethod
+    def build_request_body(self, include_validation_failure = False):
         senderBatchId = str(''.join(random.sample(
             string.ascii_uppercase + string.digits, k=7)))
-        amount = "1.0.0" if include_validation_failure else "1.00"
+        amount = self.amount # if include_validation_failure else "1.00"
         return \
             {
                 "sender_batch_header": {
@@ -47,12 +49,12 @@ class CreatePayouts(PayPalClient):
                     "email_subject": "This is a test transaction from SDK"
                 },
                 "items": [{
-                    "note": "Your 1$ Payout!",
+                    "note": "Thanks for using smalltaskers!",
                     "amount": {
                         "currency": "USD",
                         "value": amount
                     },
-                    "receiver": "",
+                    "receiver": self.receiver,
                     "sender_item_id": "Test_txn_1"
                 }]
             }
@@ -90,12 +92,12 @@ def payment_success(request):
         post_data = json.loads(request.body.decode("utf-8"))
 
         try:
-            uf = UserFund.object.get(user=request.user)
+            uf = UserFund.objects.get(user=request.user)
         except UserFund.DoesNotExist:
             UserFund(user=request.user, fund=0).save()
-            uf = UserFund.object.get(user=request.user)
+            uf = UserFund.objects.get(user=request.user)
 
-        uf.fund += post_data["amount"]
+        uf.fund += float(post_data["amount"])
         uf.save()
 
         print(post_data)
@@ -103,6 +105,15 @@ def payment_success(request):
         return JsonResponse({"success": True})
 
 def paypal_payout_view(request):
-    create_response = CreatePayouts().create_payouts(True)
-    return JsonResponse({"status code": create_response.status_code})
-
+    if request.method == "POST":
+        create_response = CreatePayouts(str(float(request.POST['amount'])), request.user.username).create_payouts(True)
+        if int(create_response.status_code) == 201:
+            uf = UserFund.objects.get(user=request.user)
+            uf.fund = uf.fund - float(request.POST['amount'])
+            uf.save()
+        return JsonResponse({"status code": create_response.status_code})
+    else:
+        uf = UserFund.objects.get(user=request.user)
+        return render(request, "paypal/payment.html", {
+            "uf": uf
+        })
