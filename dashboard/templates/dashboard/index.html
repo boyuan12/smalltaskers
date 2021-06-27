@@ -5,5 +5,23 @@
 {% endblock %}
 
 {% block main %}
+    {% load money_format_filter %}
     <h1>All Jobs Available: </h1>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for j in jobs %}
+                <tr>
+                    <td><a href="/task/{{ j.id }}">{{ j.title }}</a></td>
+                    <td>{{ j.price | currency }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+
 {% endblock %}

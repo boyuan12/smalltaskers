@@ -20,11 +20,11 @@
         </div>
         <div class="mb-3">
             <label for="price" class="form-label">Price Per Each Valid Completion</label>
-            <input type="number" class="form-control" id="price" name="price">
+            <input type="number" class="form-control" id="price" name="price" step="0.01" min="0.01">
         </div>
         <div class="mb-3">
             <label for="quantity" class="form-label">Quantity (How many people do you want to reach?) </label>
-            <input type="number" class="form-control" id="quantity" name="quantity">
+            <input type="number" class="form-control" id="quantity" name="quantity" min="0">
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
