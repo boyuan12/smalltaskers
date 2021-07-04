@@ -15,7 +15,7 @@
     <small>Please make sure only submit relevant information. Don't submit anything else in order to not get marked as spam by employers.</small>
     <form method="POST">
         {% csrf_token %}
-        <textarea name="proof" cols="30" rows="10"></textarea>
+        <textarea name="proof" cols="30" rows="10" id="proof"></textarea>
         <button type="submit">Submit</button>
     </form>
     <div style="border: 3px solid black; width: 300px; height: 100px;" id="dropzone">
@@ -63,6 +63,7 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)
+                        document.getElementById("proof").innerText += data.url
                     })
                     var LI = document.createElement("LI")
                     LI.innerText = path + file.name

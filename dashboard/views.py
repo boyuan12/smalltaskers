@@ -1,6 +1,6 @@
 from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
-from .models import Job
+from .models import Job, Submission
 from paypal.models import UserFund
 from django.views.decorators.csrf import csrf_exempt
 import boto3
@@ -28,9 +28,21 @@ def post_job(request):
 
 def view_task(request, task_id):
     task = Job.objects.get(id=task_id)
-    return render(request, "dashboard/task.html", {
-        "task": task
-    })
+
+    try:
+        Submission.objects.get(job=task, user=request.user)
+        return HttpResponse("You already submitted a proof, please wait employer to send you a response back. ")
+    except Submission.DoesNotExist:
+        pass
+
+    if request.method == "POST":
+        Submission(user=request.user, job=task, proof=request.POST["proof"]).save()
+        return HttpResponse("Proof submitted successfully. If you don't hear a response back within a week, your submission will automatically approved")
+
+    else:
+        return render(request, "dashboard/task.html", {
+            "task": task
+        })
 
 @csrf_exempt
 def file_upload_backend(request):
@@ -40,3 +52,15 @@ def file_upload_backend(request):
     s3.Bucket('smalltasker').put_object(Key=f"{name}{pathlib.Path(request.FILES['file'].name).suffix}", Body=request.FILES["file"], ACL="public-read")
     return JsonResponse({"url": f"https://smalltasker.s3.us-west-1.amazonaws.com/{name}{pathlib.Path(request.FILES['file'].name).suffix}"})
 
+def jobs_submitted_tasker(request):
+    tasks = Submission.objects.filter(user=request.user)
+    return render(request, "dashboard/job-submitted-dashboard.html", {
+        "tasks": tasks
+    })
+
+def cancel_job(request, job_id):
+    job = Job.objects.get(id=job_id)
+    task = Submission.objects.get(user=request.user, job=job)
+    task.status = "cancel"
+    task.save()
+    return redirect("/tasks/")

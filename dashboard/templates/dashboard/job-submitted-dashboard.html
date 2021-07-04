@@ -1,0 +1,35 @@
+{% extends "authentication/base.html" %}
+
+{% block title %}
+    Tasks Completed
+{% endblock %}
+
+{% block main %}
+    {% load money_format_filter %}
+    <h1>All Jobs Available: </h1>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Price</th>
+            <th scope="col">Timestamp</th>
+            <th scope="col">Status</th>
+            <th scope="col">Cancel</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for j in tasks %}
+                <tr>
+                    <td>{{ j.job.title }}</td>
+                    <td>{{ j.job.price | currency }}</td>
+                    <td>{{ j.timestamp }} UTC</td>
+                    <td>{{ j.status }}</td>
+                    {% if j.status != "approved" or j.status != "cancel" %}
+                        <td><a href="/tasker/job/cancel/{{ j.job.id }}">Cancel this Job</a></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+
+{% endblock %}
