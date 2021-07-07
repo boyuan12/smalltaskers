@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 import boto3
 import os
 import pathlib
+from authentication.models import Profile
 
 s3 = boto3.resource("s3", aws_access_key_id=os.getenv("S3_ACCESS_KEY_ID"), aws_secret_access_key=os.getenv("S3_SECRET_ACCESS_KEY_ID"))
 
@@ -61,6 +62,22 @@ def jobs_submitted_tasker(request):
 def cancel_job(request, job_id):
     job = Job.objects.get(id=job_id)
     task = Submission.objects.get(user=request.user, job=job)
-    task.status = "cancel"
-    task.save()
+    task.delete()
     return redirect("/tasks/")
+
+def employer_dashboard(request):
+    jobs = Job.objects.filter(user=request.user)
+    submissions = []
+    for job in jobs:
+        submissions.append(Submission.objects.filter(job=job))
+    return render(request, "dashboard/employer-dashboard.html", {
+        "submissions": submissions
+    })
+
+def review_submission(request, submission_id):
+    submission = Submission.objects.get(id=submission_id)
+    profile = Profile.objects.get(user=submission.user)
+    return render(request, "dashboard/submission.html", {
+        "submission": submission,
+        "profile": profile
+    })

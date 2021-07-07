@@ -1,0 +1,35 @@
+{% extends "authentication/base.html" %}
+
+{% block title %}
+    Tasks Completed
+{% endblock %}
+
+{% block main %}
+    {% load money_format_filter %}
+    <h1>Job Submitted: </h1>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Price</th>
+            <th scope="col">Submitted Timestamp</th>
+            <th scope="col">Status</th>
+            <th scope="col">Decision</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for sub in submissions %}
+                {% for s in sub %}
+                    <tr>
+                        <td><a href="/submission/{{ s.id }}">{{ s.job.title }}</a></td>
+                        <td>{{ s.job.price | currency }}</td>
+                        <td>{{ s.timestamp }} UTC</td>
+                        <td>{{ s.status }}</td>
+                        <td>Approve, Revise, Fail</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+      </table>
+
+{% endblock %}

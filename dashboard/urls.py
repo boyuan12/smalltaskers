@@ -7,5 +7,7 @@ urlpatterns = [
     path("task/<int:task_id>/", views.view_task),
     path("api/upload/", views.file_upload_backend),
     path("tasks/", views.jobs_submitted_tasker),
-    path("tasker/job/cancel/<int:job_id>", views.cancel_job)
+    path("tasker/job/cancel/<int:job_id>", views.cancel_job),
+    path("employer-dashboard/", views.employer_dashboard),
+    path("submission/<int:submission_id>", views.review_submission),
 ]
