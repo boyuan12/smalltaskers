@@ -25,7 +25,7 @@ SECRET_KEY = 'hn!jo7nxvhgh=$7e50rktx*19t2sck9(y15s()kc)6reektt*@'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["smalltaskers.herokuapp.com"]
+ALLOWED_HOSTS = ["smalltaskers.projects.devwithme.xyz", "smalltaskers.herokuapp.com"]
 
 
 # Application definition
