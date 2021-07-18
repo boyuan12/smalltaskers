@@ -7,17 +7,20 @@ import boto3
 import os
 import pathlib
 from authentication.models import Profile
+from django.contrib.auth.decorators import login_required
 
 s3 = boto3.resource("s3", aws_access_key_id=os.getenv("S3_ACCESS_KEY_ID"), aws_secret_access_key=os.getenv("S3_SECRET_ACCESS_KEY_ID"))
 
 
 # Create your views here.
+@login_required(login_url="/auth/login/")
 def index(request):
     jobs = Job.objects.all()
     return render(request, "dashboard/index.html", {
         "jobs": jobs
     })
 
+@login_required(login_url="/auth/login/")
 def post_job(request):
     if request.method == "POST":
         uf = UserFund.objects.get(user=request.user)
@@ -27,6 +30,7 @@ def post_job(request):
         return redirect("/")
     return render(request, "dashboard/post-job.html")
 
+@login_required(login_url="/auth/login/")
 def view_task(request, task_id):
     task = Job.objects.get(id=task_id)
 
@@ -63,18 +67,21 @@ def file_upload_backend(request):
     s3.Bucket('smalltasker').put_object(Key=f"{name}{pathlib.Path(request.FILES['file'].name).suffix}", Body=request.FILES["file"], ACL="public-read")
     return JsonResponse({"url": f"https://smalltasker.s3.us-west-1.amazonaws.com/{name}{pathlib.Path(request.FILES['file'].name).suffix}"})
 
+@login_required(login_url="/auth/login/")
 def jobs_submitted_tasker(request):
     tasks = Submission.objects.filter(user=request.user)
     return render(request, "dashboard/job-submitted-dashboard.html", {
         "tasks": tasks
     })
 
+@login_required(login_url="/auth/login/")
 def cancel_job(request, job_id):
     job = Job.objects.get(id=job_id)
     task = Submission.objects.get(user=request.user, job=job)
     task.delete()
     return redirect("/tasks/")
 
+@login_required(login_url="/auth/login/")
 def employer_dashboard(request):
     jobs = Job.objects.filter(user=request.user)
     submissions = []
@@ -84,6 +91,7 @@ def employer_dashboard(request):
         "submissions": submissions
     })
 
+@login_required(login_url="/auth/login/")
 def review_submission(request, submission_id):
     submission = Submission.objects.get(id=submission_id)
     profile = Profile.objects.get(user=submission.user)
@@ -92,6 +100,7 @@ def review_submission(request, submission_id):
         "profile": profile
     })
 
+@login_required(login_url="/auth/login/")
 def employer_submission_failed(request, submission_id):
     submission = Submission.objects.get(id=submission_id)
     if submission.status == "success" or submission.status == "failed":
@@ -101,6 +110,7 @@ def employer_submission_failed(request, submission_id):
     submission.save()
     return redirect("/employer-dashboard/")
 
+@login_required(login_url="/auth/login/")
 def employer_submission_revise(request, submission_id):
     submission = Submission.objects.get(id=submission_id)
     if submission.status == "success" or submission.status == "failed":
@@ -110,6 +120,7 @@ def employer_submission_revise(request, submission_id):
     submission.save()
     return redirect("/employer-dashboard/")
 
+@login_required(login_url="/auth/login/")
 def employer_submission_success(request, submission_id):
     submission = Submission.objects.get(id=submission_id)
     if submission.status == "success" or submission.status == "failed":

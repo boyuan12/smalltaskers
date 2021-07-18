@@ -50,6 +50,8 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
+            if request.GET.get("next"):
+                return redirect(request.GET.get("next"))
             return redirect("/")
         return HttpResponse("Invalid credentials")
 
