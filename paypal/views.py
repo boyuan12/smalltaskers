@@ -113,7 +113,10 @@ def paypal_payout_view(request):
             uf.save()
         return JsonResponse({"status code": create_response.status_code})
     else:
-        uf = UserFund.objects.get(user=request.user)
+        try:
+            uf = UserFund.objects.get(user=request.user)
+        except UserFund.DoesNotExist:
+            uf = UserFund(user=request.user, fund=0).save()
         return render(request, "paypal/payment.html", {
             "uf": uf
         })

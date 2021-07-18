@@ -10,8 +10,15 @@
     <p>User: {{ profile.member_username }}</p>
     <p>Submitted: {{ submission.proof }}</p>
 
-    <button class="btn btn-danger">Mark as Failed</button>
-    <button class="btn btn-warning">Mark as Revise</button>
-    <button class="btn btn-success">Mark as Submitted</button>
+    {% if submission.status == "success" or submission.status == "failed" %}
+        <button class="btn btn-danger" onclick="location.assign('/submission/{{ submission.id }}/failed/')" disabled>Mark as Failed</button>
+        <button class="btn btn-warning" onclick="location.assign('/submission/{{ submission.id }}/revise/')" disabled>Mark as Revise</button>
+        <button class="btn btn-success" onclick="location.assign('/submission/{{ submission.id }}/success/')" disabled>Mark as Submitted</button>
+
+    {% else %}
+        <button class="btn btn-danger" onclick="location.assign('/submission/{{ submission.id }}/failed/')">Mark as Failed</button>
+        <button class="btn btn-warning" onclick="location.assign('/submission/{{ submission.id }}/revise/')">Mark as Revise</button>
+        <button class="btn btn-success" onclick="location.assign('/submission/{{ submission.id }}/success/')">Mark as Submitted</button>
+    {% endif %}
 
 {% endblock %}

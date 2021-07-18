@@ -10,4 +10,7 @@ urlpatterns = [
     path("tasker/job/cancel/<int:job_id>", views.cancel_job),
     path("employer-dashboard/", views.employer_dashboard),
     path("submission/<int:submission_id>", views.review_submission),
+    path("submission/<int:submission_id>/failed/", views.employer_submission_failed),
+    path("submission/<int:submission_id>/success/", views.employer_submission_success),
+    path("submission/<int:submission_id>/revise/", views.employer_submission_revise),
 ]

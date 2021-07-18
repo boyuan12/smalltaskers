@@ -31,13 +31,23 @@ def view_task(request, task_id):
     task = Job.objects.get(id=task_id)
 
     try:
-        Submission.objects.get(job=task, user=request.user)
+        s = Submission.objects.get(job=task, user=request.user)
+        if s.status == "revise":
+            return render(request, "dashboard/task.html", {
+                "task": task,
+                "submission": s
+            })
         return HttpResponse("You already submitted a proof, please wait employer to send you a response back. ")
     except Submission.DoesNotExist:
         pass
 
     if request.method == "POST":
-        Submission(user=request.user, job=task, proof=request.POST["proof"]).save()
+        try:
+            s = Submission(user=request.user, job=task, status="revise")
+            s.proof = request.POST["proof"]
+            s.save()
+        except Submission.DoesNotExist:
+            Submission(user=request.user, job=task, proof=request.POST["proof"]).save()
         return HttpResponse("Proof submitted successfully. If you don't hear a response back within a week, your submission will automatically approved")
 
     else:
@@ -81,3 +91,40 @@ def review_submission(request, submission_id):
         "submission": submission,
         "profile": profile
     })
+
+def employer_submission_failed(request, submission_id):
+    submission = Submission.objects.get(id=submission_id)
+    if submission.status == "success" or submission.status == "failed":
+        return HttpResponse("You can't modify the status anymore")
+
+    submission.status = "failed"
+    submission.save()
+    return redirect("/employer-dashboard/")
+
+def employer_submission_revise(request, submission_id):
+    submission = Submission.objects.get(id=submission_id)
+    if submission.status == "success" or submission.status == "failed":
+        return HttpResponse("You can't modify the status anymore")
+
+    submission.status = "revise"
+    submission.save()
+    return redirect("/employer-dashboard/")
+
+def employer_submission_success(request, submission_id):
+    submission = Submission.objects.get(id=submission_id)
+    if submission.status == "success" or submission.status == "failed":
+        return HttpResponse("You can't modify the status anymore")
+
+    submission.status = "success"
+    submission.save()
+
+    worker_fund = UserFund.objects.get(user=submission.user)
+    employer_fund = UserFund.objects.get(user=submission.job.user)
+    price = submission.job.price
+
+    worker_fund.fund += price
+    employer_fund.fund -= price
+    worker_fund.save()
+    employer_fund.save()
+
+    return redirect("/employer-dashboard/")
