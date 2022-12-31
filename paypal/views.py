@@ -17,7 +17,7 @@ from paypalhttp.encoder import Encoder
 client_id = os.getenv("PAYPAL_CLIENT_ID")
 client_secret = os.getenv("PAYPAL_CLIENT_SECRET")
 # Creating an environment
-environment = SandboxEnvironment(client_id=client_id, client_secret=client_secret)
+environment = LiveEnvironment(client_id=client_id, client_secret=client_secret)
 client = PayPalHttpClient(environment)
 
 
